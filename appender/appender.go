@@ -1,8 +1,8 @@
 package appender
 
 import (
+	"github.com/lingdor/go-logcar/entity"
 	"github.com/lingdor/logcar/cfg"
-	"github.com/lingdor/logcar/entity"
 )
 
 type Appender interface {

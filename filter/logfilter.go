@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lingdor/logcar/entity"
+	"github.com/lingdor/go-logcar/entity"
 )
 
 type CommonFilter struct {

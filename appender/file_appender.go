@@ -12,8 +12,8 @@ import (
 
 	"syscall"
 
+	"github.com/lingdor/go-logcar/entity"
 	"github.com/lingdor/logcar/cfg"
-	"github.com/lingdor/logcar/entity"
 	"github.com/lingdor/logcar/filter"
 )
 

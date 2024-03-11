@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/lingdor/go-logcar/entity"
 	"github.com/lingdor/logcar/appender"
 	"github.com/lingdor/logcar/cfg"
-	"github.com/lingdor/logcar/entity"
 )
 
 var argFile string
@@ -40,9 +40,10 @@ func readLine(reader *bufio.Reader) (*entity.LogLine, error) {
 			//			Level:  entity.LogLeveInfo,
 		}
 		if !prefix {
-			if len(line) > 0 && line[0] <= entity.LogLevelAll && line[0] >= entity.LogLeveLOff {
+			if len(line) > 0 && line[0] <= entity.WrapChar && line[0] >= entity.LogLeveLOff {
 				lineInf.Level = rune(line[0])
 				lineInf.Line = lineInf.Line[1:]
+				lineInf.Prefix = (line[0] == entity.WrapChar)
 			}
 		}
 		return lineInf, nil

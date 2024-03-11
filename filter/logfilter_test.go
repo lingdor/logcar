@@ -4,7 +4,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/lingdor/logcar/entity"
+	"github.com/lingdor/go-logcar/entity"
 )
 
 func TestNamesLevel(t *testing.T) {
