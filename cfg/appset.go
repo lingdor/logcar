@@ -1,9 +1,10 @@
 package cfg
 
 import (
-	"github.com/ghodss/yaml"
 	"io"
 	"os"
+
+	"github.com/ghodss/yaml"
 )
 
 var AppSet struct {
@@ -20,7 +21,7 @@ type AppenderConfig struct {
 	Type   string
 	Filter struct {
 		Levels string
-		Regex string
+		Regex  string
 	}
 	Option map[string]any
 }
@@ -30,6 +31,7 @@ func LoadConfigFile(fname string) error {
 		defer file.Close()
 		var bs []byte
 		if bs, err = io.ReadAll(file); err == nil {
+			bs = []byte(os.ExpandEnv(string(bs)))
 			return yaml.Unmarshal(bs, &AppSet)
 		}
 		return err
