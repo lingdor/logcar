@@ -11,6 +11,7 @@
 __debug_*
 main
 .DS_Store
+bin/*
 
 # Test binary, built with `go test -c`
 *.test

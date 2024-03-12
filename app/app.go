@@ -95,7 +95,14 @@ func newAppender(appenderConfig *cfg.AppenderConfig, ch <-chan *entity.LogLine) 
 			Logpath: logpath.(string),
 			Config:  appenderConfig,
 		}
-	// case "stdout":
+	case "stdout":
+		ret = &appender.DirectAppender{
+			Writer: os.Stdout,
+		}
+	case "stderr":
+		ret = &appender.DirectAppender{
+			Writer: os.Stderr,
+		}
 	default:
 		panic(fmt.Errorf("no found appender type:%s", appenderConfig.Type))
 	}

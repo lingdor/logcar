@@ -15,12 +15,12 @@ logcar:
           to-file: /tmp/app.info.%Y-%m-%d-%H-%no
           pre-command:
           end-command:
-    # - type: stderr
-    #   filter:
-    #     levels: error, warn
-    # - type: stdout
-    #   filter:
-    #     levels: info
+    - type: stderr
+      filter:
+        levels: error, warn
+    - type: stdout
+      filter:
+        levels: info
     # - type: kafka
     #   levels: all
     #   topic:

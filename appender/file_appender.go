@@ -10,8 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"syscall"
-
+	"github.com/djherbis/times"
 	"github.com/lingdor/go-logcar/entity"
 	"github.com/lingdor/logcar/cfg"
 	"github.com/lingdor/logcar/filter"
@@ -42,16 +41,29 @@ func (f *FileAppender) GetLogPath() string {
 	return f.Logpath
 }
 func (f *FileAppender) CTime() (int64, error) {
-	if stat, err := os.Stat(f.Logpath); err == nil {
-		if cstate, ok := stat.Sys().(*syscall.Stat_t); ok {
-			sec := cstate.Ctimespec.Sec
-			return sec, nil
+
+	if stat, err := times.Stat(f.Logpath); err == nil {
+		if stat.HasChangeTime() {
+			return stat.ChangeTime().Unix(), nil
+		} else if stat.HasBirthTime() {
+			return stat.BirthTime().Unix(), nil
 		} else {
-			panic(fmt.Errorf("get ctimespec faild"))
+			panic("does'nt get a ctime")
 		}
 	} else {
 		return 0, err
 	}
+
+	// if stat, err := os.Stat(f.Logpath); err == nil {
+	// 	if cstate, ok := stat.Sys().(*syscall.Stat_t); ok {
+	// 		sec := cstate.Ctimespec.Sec
+	// 		return sec, nil
+	// 	} else {
+	// 		panic(fmt.Errorf("get ctimespec faild"))
+	// 	}
+	// } else {
+	// 	return 0, err
+	// }
 }
 
 func (f *FileAppender) Init(appenderConfig *cfg.AppenderConfig, ch <-chan *entity.LogLine) {
