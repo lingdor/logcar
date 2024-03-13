@@ -30,22 +30,20 @@ func LevelNamesToCode(names string) int {
 		switch strings.ToLower(strings.TrimSpace(levelName)) {
 		case "trace":
 			levels |= levelVals[entity.LogLeveLTrace]
-			break
 		case "debug":
 			levels |= levelVals[entity.LogLeveLDebug]
-			break
 		case "info":
 			levels |= levelVals[entity.LogLeveLInfo]
-			break
 		case "warn":
 			levels |= levelVals[entity.LogLeveLWarn]
-			break
 		case "error":
 			levels |= levelVals[entity.LogLeveLError]
-			break
 		case "fatal":
 			levels |= levelVals[entity.LogLeveLFatal]
-			break
+		case "off":
+			return entity.LogLeveLOff
+		case "all":
+			return entity.LogLevelAll
 		}
 	}
 	return levels
