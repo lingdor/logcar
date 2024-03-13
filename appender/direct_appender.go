@@ -25,8 +25,14 @@ func (f *DirectAppender) Init(appenderConfig *cfg.AppenderConfig, ch <-chan *ent
 func (f *DirectAppender) goConsume() {
 	for {
 		line := <-f.ch
+		// fmt.Printf("%+v %q\n", line, string(line.Line))
 		if f.commonFilter.IsMatch(line) {
-			f.Writer.Write(line.Line)
+			// fmt.Fprintf(f.Writer, "%q", line.Line)
+			if _, err := f.Writer.Write(line.Line); err == nil {
+				if !line.Prefix {
+					f.Writer.Write([]byte("\n"))
+				}
+			}
 		}
 	}
 }

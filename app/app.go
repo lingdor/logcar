@@ -28,24 +28,33 @@ func checkValid() {
 
 func readLine(reader *bufio.Reader) (*entity.LogLine, error) {
 	var line []byte
-	var prefix bool
+	var lastprefix, prefix = false, false
 	var err error
 	if line, prefix, err = reader.ReadLine(); err == nil {
 		if line == nil {
 			return nil, nil
 		}
+		// fmt.Printf("%q\n", line)
 		lineInf := &entity.LogLine{
 			Line:   line,
 			Prefix: prefix,
-			//			Level:  entity.LogLeveInfo,
+			Level:  ' ',
 		}
-		if !prefix {
-			if len(line) > 0 && line[0] <= entity.WrapChar && line[0] >= entity.LogLeveLOff {
+		if !lastprefix {
+			if len(line) > 0 && line[0] == entity.WrapChar {
+				lineInf.Line = lineInf.Line[1:]
+			} else if len(line) > 0 && line[0] < entity.WrapChar && line[0] > entity.LogLevelOff {
 				lineInf.Level = rune(line[0])
 				lineInf.Line = lineInf.Line[1:]
-				lineInf.Prefix = (line[0] == entity.WrapChar)
+			} else {
+				lineInf.Level = entity.LogLevelInfo
 			}
 		}
+		// fmt.Printf("%+v,%q\n", lineInf, lineInf.Line)
+		lastprefix = prefix
+		newl := make([]byte, len(lineInf.Line))
+		copy(newl, lineInf.Line)
+		lineInf.Line = newl
 		return lineInf, nil
 	}
 	return nil, err
@@ -70,6 +79,8 @@ func StartApp() {
 				if line == nil {
 					return
 				}
+
+				// fmt.Printf("%+v,%q\n", line, string(line.Line))
 				for _, ch := range chs {
 					ch <- line
 				}

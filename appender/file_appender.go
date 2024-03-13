@@ -31,8 +31,7 @@ type FileAppender struct {
 	Config       *cfg.AppenderConfig
 	commonFilter *filter.CommonFilter
 	ch           <-chan *entity.LogLine
-	files        [2]*os.File
-	filesI       *int32
+	file         atomic.Pointer[os.File]
 	triggers     []FileTrigger
 	achiveMutex  sync.Mutex
 }
@@ -68,9 +67,7 @@ func (f *FileAppender) CTime() (int64, error) {
 
 func (f *FileAppender) Init(appenderConfig *cfg.AppenderConfig, ch <-chan *entity.LogLine) {
 
-	var i int32 = 0
 	var err error
-	f.filesI = &i
 	f.commonFilter = filter.NewFilter(appenderConfig.Option)
 	f.ch = ch
 	if appenderConfig.Option["path"] == nil {
@@ -81,8 +78,9 @@ func (f *FileAppender) Init(appenderConfig *cfg.AppenderConfig, ch <-chan *entit
 	} else {
 		panic(errors.New("path of file-appender must be string"))
 	}
-	if f.files[0], err = os.OpenFile(f.Logpath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
-
+	var file *os.File
+	if file, err = os.OpenFile(f.Logpath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
+		f.file.Store(file)
 		if triggers, ok := appenderConfig.Option["triggers"].([]any); ok {
 			f.triggers = make([]FileTrigger, 0, len(triggers))
 			for _, triggerItem := range triggers {
@@ -137,10 +135,12 @@ func (f *FileAppender) Achive() {
 				}
 				os.Rename(f.Logpath, tofile)
 				if newfile, err := os.OpenFile(f.Logpath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
-					i := atomic.LoadInt32(f.filesI)
-					oldf := f.files[i%2]
-					f.files[(i+1)%2] = newfile
-					atomic.CompareAndSwapInt32(f.filesI, i, i+1)
+
+					// i := atomic.LoadInt32(f.filesI)
+					oldf := f.file.Load()
+					f.file.CompareAndSwap(oldf, newfile)
+					// f.files[(i+1)%2] = newfile
+					// atomic.CompareAndSwapInt32(f.filesI, i, i+1)
 					oldf.Close()
 				}
 			}
@@ -152,17 +152,19 @@ func (f *FileAppender) Achive() {
 
 // Write write log content
 func (f *FileAppender) goConsume() {
+
 	for {
 		line := <-f.ch
 		if f.commonFilter.IsMatch(line) {
 			var err error
 			for i := 0; i < 2; i++ {
-				i := atomic.LoadInt32(f.filesI) % 2
-				file := f.files[i]
+				// i := atomic.LoadInt32(f.filesI) % 2
+				file := f.file.Load()
 				if _, err = file.Write(line.Line); err == nil {
 					if !line.Prefix {
 						file.WriteString("\n")
 					}
+					break
 				} else {
 					continue
 				}

@@ -29,19 +29,19 @@ func LevelNamesToCode(names string) int {
 	for _, levelName := range strings.Split(names, ",") {
 		switch strings.ToLower(strings.TrimSpace(levelName)) {
 		case "trace":
-			levels |= levelVals[entity.LogLeveLTrace]
+			levels |= levelVals[entity.LogLevelTrace]
 		case "debug":
-			levels |= levelVals[entity.LogLeveLDebug]
+			levels |= levelVals[entity.LogLevelDebug]
 		case "info":
-			levels |= levelVals[entity.LogLeveLInfo]
+			levels |= levelVals[entity.LogLevelInfo]
 		case "warn":
-			levels |= levelVals[entity.LogLeveLWarn]
+			levels |= levelVals[entity.LogLevelWarn]
 		case "error":
-			levels |= levelVals[entity.LogLeveLError]
+			levels |= levelVals[entity.LogLevelError]
 		case "fatal":
-			levels |= levelVals[entity.LogLeveLFatal]
+			levels |= levelVals[entity.LogLevelFatal]
 		case "off":
-			return entity.LogLeveLOff
+			return entity.LogLevelOff
 		case "all":
 			return entity.LogLevelAll
 		}
@@ -50,19 +50,19 @@ func LevelNamesToCode(names string) int {
 }
 
 var levelVals = map[rune]int{
-	entity.LogLeveLOff:   0,
-	entity.LogLeveLTrace: 1,
-	entity.LogLeveLDebug: 2,
-	entity.LogLeveLInfo:  4,
-	entity.LogLeveLWarn:  8,
-	entity.LogLeveLError: 16,
-	entity.LogLeveLFatal: 32,
+	entity.LogLevelOff:   0,
+	entity.LogLevelTrace: 1,
+	entity.LogLevelDebug: 2,
+	entity.LogLevelInfo:  4,
+	entity.LogLevelWarn:  8,
+	entity.LogLevelError: 16,
+	entity.LogLevelFatal: 32,
 	entity.LogLevelAll:   63,
 }
 
 func (c *CommonFilter) IsMatch(line *entity.LogLine) bool {
 
-	if line.Prefix {
+	if line.Level == ' ' {
 		return c.lastMatch
 	}
 	levelCode := levelVals[line.Level]
