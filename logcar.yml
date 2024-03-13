@@ -20,7 +20,7 @@ logcar:
     #     levels: error, warn
     - type: stdout
       filter:
-        levels: info
+        levels: all
     # - type: kafka
     #   levels: all
     #   topic:

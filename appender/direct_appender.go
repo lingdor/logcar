@@ -16,7 +16,7 @@ type DirectAppender struct {
 
 func (f *DirectAppender) Init(appenderConfig *cfg.AppenderConfig, ch <-chan *entity.LogLine) {
 
-	f.commonFilter = filter.NewFilter(appenderConfig.Option)
+	f.commonFilter = filter.NewFilter(appenderConfig)
 	f.ch = ch
 	go f.goConsume()
 }

@@ -68,7 +68,7 @@ func (f *FileAppender) CTime() (int64, error) {
 func (f *FileAppender) Init(appenderConfig *cfg.AppenderConfig, ch <-chan *entity.LogLine) {
 
 	var err error
-	f.commonFilter = filter.NewFilter(appenderConfig.Option)
+	f.commonFilter = filter.NewFilter(appenderConfig)
 	f.ch = ch
 	if appenderConfig.Option["path"] == nil {
 		panic(errors.New("no found path option of file-appender"))
