@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -26,40 +25,6 @@ func checkValid() {
 
 }
 
-func readLine(reader *bufio.Reader) (*entity.LogLine, error) {
-	var line []byte
-	var lastprefix, prefix = false, false
-	var err error
-	if line, prefix, err = reader.ReadLine(); err == nil {
-		if line == nil {
-			return nil, nil
-		}
-		// fmt.Printf("%q\n", line)
-		lineInf := &entity.LogLine{
-			Line:   line,
-			Prefix: prefix,
-			Level:  ' ',
-		}
-		if !lastprefix {
-			if len(line) > 0 && line[0] == entity.WrapChar {
-				lineInf.Line = lineInf.Line[1:]
-			} else if len(line) > 0 && line[0] < entity.WrapChar && line[0] > entity.LogLevelOff {
-				lineInf.Level = rune(line[0])
-				lineInf.Line = lineInf.Line[1:]
-			} else {
-				lineInf.Level = entity.LogLevelInfo
-			}
-		}
-		// fmt.Printf("%+v,%q\n", lineInf, lineInf.Line)
-		lastprefix = prefix
-		newl := make([]byte, len(lineInf.Line))
-		copy(newl, lineInf.Line)
-		lineInf.Line = newl
-		return lineInf, nil
-	}
-	return nil, err
-}
-
 func StartApp() {
 
 	var err error
@@ -73,19 +38,7 @@ func StartApp() {
 			appenders[i] = newAppender(&cfg.AppSet.Logcar.Appenders[i], chs[i])
 		}
 		//read/io
-		reader := bufio.NewReader(os.Stdin)
-		for {
-			if line, err := readLine(reader); err == nil {
-				if line == nil {
-					return
-				}
-
-				// fmt.Printf("%+v,%q\n", line, string(line.Line))
-				for _, ch := range chs {
-					ch <- line
-				}
-			}
-		}
+		startStdin(chs)
 	}
 	if err != nil {
 		panic(err)
