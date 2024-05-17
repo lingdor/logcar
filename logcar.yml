@@ -3,24 +3,36 @@ logcar:
     port: 1900
     ip:
   appenders:
-    # - type: file
-    #   filter:
-    #     levels: info
-    #   option:
-    #     path: /tmp/app.info
-    #     triggers:
-    #       - fileSize: 10k
-    #       - period: daily
-    #     archive:
-    #       to-file: /tmp/app.info.%Y-%m-%d-%H-%no
-    #       pre-command:
-    #       end-command:
-    # - type: stderr
-    #   filter:
-    #     levels: error, warn
-    - type: stdout
+    - type: file
       filter:
-        levels: all
+        levels: info, trace, debug
+      option:
+        path: /tmp/app.info
+        triggers:
+          - fileSize: 10k
+          - period: secondly
+        archive:
+          to-file: /tmp/app.info.%Y%m%d-%H%i%s-%no
+          pre-command:
+          end-command:
+    - type: file
+      filter:
+        levels: error,warn, fatal
+      option:
+        path: /tmp/app.wf
+        triggers:
+          - fileSize: 10k
+          - period: secondly
+        archive:
+          to-file: /tmp/app.wf.%Y%m%d-%H%i%s-%no
+          pre-command:
+          end-command:
+    - type: stderr
+      filter:
+        levels: error, warn
+    # - type: stdout
+    #   filter:
+    #     levels: all
     # - type: kafka
     #   levels: all
     #   topic:
